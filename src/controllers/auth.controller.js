@@ -1,69 +1,60 @@
-const User = require('../models/User');
-const bcrypt = require('bcryptjs');
-const jwt = require('jsonwebtoken');
-const dotenv = require('dotenv');
-const { ErrorResponse } = require('../utils/ErrorResponse');
+const httpStatus = require('http-status');
 
-dotenv.config();
+const User = require('../models/user.model');
+const { TokenBlacklisted } = require('../models/blacklist-token.model.js');
+const ErrorResponse = require('../utils/ErrorResponse');
 
 const register = async (req, res, next) => {
-    const { email, password } = req.body;
-
     try {
-        // Check if the user already exists
-        let user = await User.findOne({ email });
+        const { email, password } = req.body;
 
-        if (user) {
-            return next(new ErrorResponse('User already exists', 400));
-        }
+        const user = await User.create({ email, password });
 
-        // Create a new user
-        user = new User({
-            email,
-            password,
-        });
+        const accessToken = await user.generateAccessToken()
 
-        // Hash the password
-        const salt = await bcrypt.genSalt(10);
-        user.password = await bcrypt.hash(password, salt);
-
-        // Save the user to the database
-        await user.save();
-
-        res.status(200).json({ success: true, message: 'User registered successfully' });
+        res.status(httpStatus.CREATED).send({ user, accessToken });
     } catch (error) {
+        console.log(error);
         next(error);
     }
 };
 
 const login = async (req, res, next) => {
-    const { email, password } = req.body;
-
     try {
-        // Check if the user exists
+        const { email, password } = req.body;
+        
         const user = await User.findOne({ email });
 
-        if (!user) {
-            return next(new ErrorResponse('Invalid credentials', 401));
-        }
+        if (!user && !(await user.isPasswordMatch(password))) return next(new ErrorResponse('Incorrect email or password', httpStatus.UNAUTHORIZED));
 
-        // Check if the provided password matches the hashed password in the database
-        const isMatch = await bcrypt.compare(password, user.password);
+        const accessToken = await user.generateAccessToken();
 
-        if (!isMatch) {
-            return next(new ErrorResponse('Invalid credentials', 401));
-        }
-
-        // Generate JWT token
-        const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET, { expiresIn: '1h' });
-
-        res.status(200).json({ success: true, token });
+        res.send({ user, accessToken });
     } catch (error) {
+        console.log(error);
         next(error);
     }
-};
+}
+
+const logout = async (req, res, next) => {
+    try {
+        const token = req.headers.authorization;
+
+        if (token) {
+            await TokenBlacklisted.create(token);
+            
+            res.status(200).json({ success: true, message: 'Logout successful' });
+        } else {
+            res.status(401).json({ success: false, error: 'Unauthorized' });
+        }
+    } catch (error) {
+        console.log(error)
+        next(error);
+    }
+}
 
 module.exports = {
     register,
     login,
-};
+    logout
+}

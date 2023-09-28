@@ -1,13 +1,26 @@
 const express = require('express');
-// const authRoute = require('/routes/v1/auth.route');
-// const userRoute = require('/routes/v1/user.route');
-// const docsRoute = require('/routes/v1/docs.route');
+
+const docsRoute = require('./docs.route');
+const authRoute = require('./auth.route');
+const userRoute = require('./user.route');
 const urlRoute = require('./shortenedUrl.route')
 const config = require('../../config');
 
 const router = express.Router();
 
 const defaultRoutes = [
+  {
+    path: '/docs',
+    route: docsRoute,
+  },
+  {
+    path: '/auth',
+    route: authRoute,
+  },
+  {
+    path: '/users',
+    route: userRoute,
+  },
   {
     path: '/urls',
     route: urlRoute,
@@ -17,9 +30,21 @@ const defaultRoutes = [
 const devRoutes = [
   // routes available only in development mode
   {
+    path: '/docs',
+    route: docsRoute,
+  },
+  {
+    path: '/auth',
+    route: authRoute,
+  },
+  {
+    path: '/users',
+    route: userRoute,
+  },
+  {
     path: '/urls',
     route: urlRoute,
-  },
+  }
 ];
 
 defaultRoutes.forEach((route) => {

@@ -10,9 +10,7 @@ const envVarsSchema = object({
     }),
     PORT: string().refine((val) => Number(val)),
     MONGODB_URL: string().url().nonempty(),
-    // CLOUD_NAME: string().nonempty(),
-    // CLOUDINARY_API_KEY: string().nonempty(),
-    // CLOUDINARY_API_SECRET: string().nonempty(),
+    BASE_URL: string().url().nonempty(),
 });
 
 const envVars = process.env;
@@ -21,6 +19,7 @@ const config = {
     NODE_ENV: envVarsSchema.parse(envVars).NODE_ENV,
     PORT: envVarsSchema.parse(envVars).PORT,
     MONGODB_URL: envVarsSchema.parse(envVars).MONGODB_URL,
+    BASE_URL: envVarsSchema.parse(envVars).BASE_URL
 }
 
 module.exports = config;

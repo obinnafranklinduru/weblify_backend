@@ -7,12 +7,10 @@ const mongoSanitize = require('express-mongo-sanitize');
 const passport = require('passport');
 const xss = require('xss-clean');
 
-const { authLimiter, limiter } = require('./middlewares/rateLimiter.middleware');
-const config = require('./config');
+const limiter = require('./middlewares/rateLimiter.middleware');
 const errorHandler = require('./middlewares/error.middleware');
 const ErrorResponse = require('./utils/errorResponse');
 const jwtStrategy = require('./config/passport');
-const morgan = require('./config/morgan');
 const routes = require('./routes/v1');
 
 const app = express();
@@ -26,21 +24,11 @@ app.use(mongoSanitize()); // sanitize request data
 app.use(compression()); // gzip compression
 app.use(cors()); // enable cors
 app.options('/*', cors()); // enable cors
-// app.use('/*', limiter()); // Apply the rate limiting middleware to all requests
+app.use(limiter); // Apply the rate limiting middleware to all requests
 
 // Passport JWT Configuration
 app.use(passport.initialize());
 passport.use('jwt', jwtStrategy);
-
-if (config.NODE_ENV !== 'test') {
-    app.use(morgan.successHandler);
-    app.use(morgan.errorHandler);
-}
-
-// limit repeated failed requests to auth endpoints
-if (config.NODE_ENV === 'production') {
-    app.use('/v1/auth', authLimiter);
-}
 
 // v1 API routes
 app.use('/v1', routes);

@@ -6,10 +6,15 @@ const config = require('../config');
 
 const generateShortUrl = async (req, res, next) => {
     const { originalUrl, customText } = req.body;
-    const userId = req.user._id;
+
+    let userId = null;
 
     try {
         let shortCode;
+
+        if (req.user && req.user.id) {
+            userId = req.user.id;
+        }
 
         if (customText) {
             // If custom text is provided, use it as the shortened URL
@@ -32,7 +37,7 @@ const generateShortUrl = async (req, res, next) => {
         await newUrl.save();
         res.status(httpStatus.OK).json({
             success: true,
-            shortenedUrl: `${config.BASE_URL}/v1/sh/${shortCode}`
+            shortenedUrl: `${config.BASE_URL}/v1/urls/sh/${shortCode}`
         });
     } catch (error) {
         next(error);
@@ -40,10 +45,10 @@ const generateShortUrl = async (req, res, next) => {
 };
 
 const getShortenedUrls = async (req, res, next) => {
-    const userId = req.user._id;
-
     try {
-        // Get all shortened URLs for the logged-in user
+        let userId = req.user.id;
+
+        // Get all shortened URLs for the user (if available)
         const urls = await ShortenedUrl.find({ userId });
 
         res.status(httpStatus.OK).json({
@@ -56,11 +61,11 @@ const getShortenedUrls = async (req, res, next) => {
 };
 
 const getShortenedUrlById = async (req, res, next) => {
-    const userId = req.user._id;
-    const urlId = req.params.id;
-
     try {
-        // Get the shortened URL by ID for the logged-in user
+        let userId = req.user.id;
+        const urlId = req.params.id;
+
+        // Get the shortened URL by ID for the user (if available)
         const url = await ShortenedUrl.findOne({ _id: urlId, userId });
         if (!url) return next(new ErrorResponse('URL not found', httpStatus.NOT_FOUND));
 
@@ -93,16 +98,17 @@ const redirectToOriginalUrl = async (req, res, next) => {
 
         res.status(httpStatus.FOUND).redirect(url.originalUrl);
     } catch (error) {
+        console.error(error)
         next(error);
     }
 };
 
 const deleteShortenedUrl = async (req, res, next) => {
-    const userId = req.user._id;
-    const urlId = req.params.id;
-
     try {
-        // Delete the shortened URL by ID for the logged-in user
+        let userId = req.user.id;
+        const urlId = req.params.id;
+
+        // Delete the shortened URL by ID for the user (if available)
         const url = await ShortenedUrl.findOneAndRemove({ _id: urlId, userId });
         if (!url) return next(new ErrorResponse('URL not found', httpStatus.NOT_FOUND));
 
