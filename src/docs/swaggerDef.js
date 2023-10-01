@@ -8,7 +8,7 @@ const swaggerDef = {
     version,
     license: {
       name: 'MIT',
-      url: 'https://github.com/obinnafranklinduru/ziplink_backend/blob/master/LICENSE',
+      url: 'https://github.com/obinnafranklinduru/weblify_backend/blob/master/LICENSE',
     },
   },
   servers: [

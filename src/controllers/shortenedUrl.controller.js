@@ -3,18 +3,43 @@ const ShortenedUrl = require('../models/shortenedUrl.model');
 const ErrorResponse = require('../utils/ErrorResponse');
 const generateUniqueId = require('../utils/shortIdGenerator');
 const config = require('../config');
+const { URLValidation } = require('../validations/shortUrl.validation');
 
 const generateShortUrl = async (req, res, next) => {
+    try {
+        const { originalUrl } = req.body;
+        const urlData = URLValidation.parse({ originalUrl })
+
+        const shortCode = generateUniqueId();
+        const shortenedUrl = `${config.BASE_URL}/v1/urls/sh/${shortCode}`;
+
+        // Create a new shortened URL
+        const newUrl = await ShortenedUrl.create({
+            originalUrl: urlData.originalUrl,
+            shortCode,
+            shortenedUrl
+        });
+
+        res.status(httpStatus.CREATED).json({
+            success: true,
+            data: {
+                id: newUrl._id,
+                shortenedUrl: newUrl.shortenedUrl
+            }
+        });
+    } catch (error) {
+        next(error);
+    }
+};
+
+const generateShortUrlPrivate = async (req, res, next) => {
     const { originalUrl, customText } = req.body;
 
-    let userId = null;
+    const userId = req.user.id;
 
     try {
         let shortCode;
-
-        if (req.user && req.user.id) {
-            userId = req.user.id;
-        }
+        let shortenedUrl;
 
         if (customText) {
             // If custom text is provided, use it as the shortened URL
@@ -27,17 +52,23 @@ const generateShortUrl = async (req, res, next) => {
             shortCode = generateUniqueId();
         }
 
+        shortenedUrl = `${config.BASE_URL}/v1/urls/sh/${shortCode}`;
+
         // Create a new shortened URL
-        const newUrl = new ShortenedUrl({
+        const newUrl = await ShortenedUrl.create({
             originalUrl,
             shortCode,
+            shortenedUrl,
             userId,
         });
 
-        await newUrl.save();
-        res.status(httpStatus.OK).json({
+        
+        res.status(httpStatus.CREATED).json({
             success: true,
-            shortenedUrl: `${config.BASE_URL}/v1/urls/sh/${shortCode}`
+            data: {
+                id: newUrl._id,
+                shortenedUrl: newUrl.shortenedUrl
+            }
         });
     } catch (error) {
         next(error);
@@ -45,15 +76,28 @@ const generateShortUrl = async (req, res, next) => {
 };
 
 const getShortenedUrls = async (req, res, next) => {
+    const page = parseInt(req.query.page) || 1;
+    const limit = parseInt(req.query.limit) || 10;
+
     try {
         let userId = req.user.id;
 
         // Get all shortened URLs for the user (if available)
-        const urls = await ShortenedUrl.find({ userId });
+        const urls = await ShortenedUrl.find({ userId })
+            .select('-__v -updatedAt')
+            .sort('-createdAt')
+            .skip((page - 1) * limit)
+            .limit(limit);
+        
+        const totalDocument = urls.length;
+        const totalPages = Math.ceil(totalDocument / limit);
 
         res.status(httpStatus.OK).json({
             success: true,
-            data: urls
+            data: urls,
+            currentPage: page,
+            totalDocument,
+            totalPages,
         });
     } catch (error) {
         next(error);
@@ -66,7 +110,7 @@ const getShortenedUrlById = async (req, res, next) => {
         const urlId = req.params.id;
 
         // Get the shortened URL by ID for the user (if available)
-        const url = await ShortenedUrl.findOne({ _id: urlId, userId });
+        const url = await ShortenedUrl.findOne({ _id: urlId, userId }).select('-__v -updatedAt');
         if (!url) return next(new ErrorResponse('URL not found', httpStatus.NOT_FOUND));
 
         res.status(httpStatus.OK).json({
@@ -123,6 +167,7 @@ const deleteShortenedUrl = async (req, res, next) => {
 
 module.exports = {
     generateShortUrl,
+    generateShortUrlPrivate,
     getShortenedUrls,
     getShortenedUrlById,
     redirectToOriginalUrl,

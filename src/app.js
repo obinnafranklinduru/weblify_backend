@@ -24,7 +24,7 @@ app.use(mongoSanitize()); // sanitize request data
 app.use(compression()); // gzip compression
 app.use(cors()); // enable cors
 app.options('/*', cors()); // enable cors
-app.use(limiter); // Apply the rate limiting middleware to all requests
+// app.use(limiter); // Apply the rate limiting middleware to all requests
 
 // Passport JWT Configuration
 app.use(passport.initialize());

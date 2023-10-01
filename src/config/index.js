@@ -11,6 +11,7 @@ const envVarsSchema = object({
     PORT: string().refine((val) => Number(val)),
     MONGODB_URL: string().url().nonempty(),
     BASE_URL: string().url().nonempty(),
+    JWT_SECRET: string().nonempty(),
 });
 
 const envVars = process.env;
@@ -19,7 +20,8 @@ const config = {
     NODE_ENV: envVarsSchema.parse(envVars).NODE_ENV,
     PORT: envVarsSchema.parse(envVars).PORT,
     MONGODB_URL: envVarsSchema.parse(envVars).MONGODB_URL,
-    BASE_URL: envVarsSchema.parse(envVars).BASE_URL
+    BASE_URL: envVarsSchema.parse(envVars).BASE_URL,
+    JWT_SECRET: envVarsSchema.parse(envVars).JWT_SECRET
 }
 
 module.exports = config;

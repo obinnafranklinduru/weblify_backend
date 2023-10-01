@@ -1,4 +1,4 @@
-const express = require('express');
+const httpStatus = require('http-status');
 const User = require('../models/user.model');
 
 const getUsers = async (req, res, next) => {
@@ -6,15 +6,17 @@ const getUsers = async (req, res, next) => {
     const limit = parseInt(req.query.limit) || 10;
 
     try {
-        const users = await User.find()
+        const users = await User.find({})
+            .select('-__v -password')
             .skip((page - 1) * limit)
             .limit(limit);
 
         const totalUsers = await User.countDocuments();
         const totalPages = Math.ceil(totalUsers / limit);
 
-        res.status(200).json({
-            users,
+        res.status(httpStatus.OK).json({
+            success: true,
+            data: users,
             currentPage: page,
             totalPages,
             totalUsers,
@@ -26,38 +28,25 @@ const getUsers = async (req, res, next) => {
 
 const getUserById = async (req, res, next) => {
     try {
-        const user = await User.findById(req.params.userId);
+        const user = await User.findById(req.params.userId).select('-__v -password');
         if (!user) {
-            return res.status(404).json({ message: 'User not found' });
+            return res.status(httpStatus.NOT_FOUND).json({ message: 'User not found' });
         }
-        res.status(200).json({ user });
+        res.status(httpStatus.OK).json({ user });
     } catch (error) {
         next(error);
     }
 };
 
-const updateUserById = async (req, res, next) => {
-    try {
-        const updatedUser = await User.findByIdAndUpdate(req.params.userId, req.body, {
-            new: true,
-            runValidators: true,
-        });
-        if (!updatedUser) {
-            return res.status(404).json({ message: 'User not found' });
-        }
-        res.status(200).json({ updatedUser });
-    } catch (error) {
-        next(error);
-    }
-};
 
 const deleteUserById = async (req, res, next) => {
     try {
-        const deletedUser = await User.findByIdAndDelete(req.params.userId);
+        const deletedUser = await User.findByIdAndRemove(req.user.id);
+        console.log(deletedUser)
         if (!deletedUser) {
-            return res.status(404).json({ message: 'User not found' });
+            return res.status(httpStatus.NOT_FOUND).json({ message: 'User not found' });
         }
-        res.status(200).json({ message: 'User deleted successfully' });
+        res.status(httpStatus.OK).json({ message: 'User deleted successfully' });
     } catch (error) {
         next(error);
     }
@@ -66,6 +55,5 @@ const deleteUserById = async (req, res, next) => {
 module.exports = {
     getUsers,
     getUserById,
-    updateUserById,
     deleteUserById
 }
