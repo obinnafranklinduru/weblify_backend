@@ -29,8 +29,7 @@
     "es7",
     "es8",
     "es9",
-    "jest",
-    "joi"
+    "jest"
   ],
   "dependencies": {
     "bcryptjs": "^2.4.3",
