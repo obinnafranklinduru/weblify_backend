@@ -6,9 +6,6 @@
   "repository": "https://github.com/obinnafranklinduru/weblify_backend.git",
   "author": "Obinna Franklin Duru <obinnafranklinduru@gmail.com>",
   "license": "MIT",
-  "engines": {
-    "node": ">=12.0.0"
-  },
   "scripts": {
     "start": "node src/server.js",
     "build": "yarn install",
