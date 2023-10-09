@@ -1,7 +1,7 @@
 const http = require('http');
 const app = require('./app');
-const ConnectDatabase = require('./config/database');
-const config = require('./config');
+const ConnectDatabase = require('./src/config/database');
+const config = require('./src/config');
 
 const PORT = config.PORT || 3000;
 
