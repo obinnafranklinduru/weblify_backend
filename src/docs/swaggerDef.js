@@ -13,6 +13,9 @@ const swaggerDef = {
   },
   servers: [
     {
+      url: `https://weblify.cyclic.app/v1`,
+    },
+    {
       url: `http://localhost:${config.PORT}/v1`,
     },
   ],
