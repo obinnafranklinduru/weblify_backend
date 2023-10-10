@@ -7,11 +7,11 @@ const mongoSanitize = require('express-mongo-sanitize');
 const passport = require('passport');
 const xss = require('xss-clean');
 
-const limiter = require('./src/middlewares/rateLimiter.middleware');
-const errorHandler = require('./src/middlewares/error.middleware');
-const ErrorResponse = require('./src/utils/errorResponse');
-const jwtStrategy = require('./src/config/passport');
-const routes = require('./src/routes/v1');
+const limiter = require('./middlewares/rateLimiter.middleware');
+const errorHandler = require('./middlewares/error.middleware');
+const ErrorResponse = require('./utils/errorResponse');
+const jwtStrategy = require('./config/passport');
+const routes = require('./routes/v1');
 
 const app = express();
 
