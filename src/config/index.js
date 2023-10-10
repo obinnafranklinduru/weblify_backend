@@ -1,17 +1,16 @@
-const path = require('path');
 const dotenv = require('dotenv');
 const { object, string } = require('zod');
 
-dotenv.config({ path: path.join(__dirname, '../../.env') });
+dotenv.config();
 
 const envVarsSchema = object({
     NODE_ENV: string().refine((val) => ['production', 'development', 'test'].includes(val), {
         message: 'NODE_ENV must be one of "production", "development", or "test"',
     }),
     PORT: string().refine((val) => Number(val)),
-    MONGODB_URL: string().url().nonempty(),
-    BASE_URL: string().url().nonempty(),
-    JWT_SECRET: string().nonempty(),
+    MONGODB_URL: string(),
+    BASE_URL: string(),
+    JWT_SECRET: string(),
 });
 
 const envVars = process.env;
