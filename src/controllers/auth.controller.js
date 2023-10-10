@@ -1,6 +1,6 @@
 const httpStatus = require('http-status');
 
-const ErrorResponse = require('../utils/ErrorResponse');
+const { ErrorResponse } = require('../utils/errorResponse');
 const User = require('../models/user.model');
 const { BlacklistedToken, isTokenBlacklisted } = require('../models/blacklist-token.model');
 const { UserRegisterValidation, UserLogInValidation } = require('../validations/auth.validation');
