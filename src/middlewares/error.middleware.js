@@ -1,6 +1,6 @@
 const httpStatus = require('http-status');
 const env = require('../config');
-const ErrorResponse = require('../utils/errorResponse');
+const { ErrorResponse } = require('../utils/errorResponse');
 
 const errorHandler = (err, req, res, next) => {
     let error = { ...err };
