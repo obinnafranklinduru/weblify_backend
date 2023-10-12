@@ -55,7 +55,6 @@ const login = async (req, res, next) => {
             }
         );
     } catch (error) {
-        console.log(error);
         next(error);
     }
 }
@@ -73,7 +72,6 @@ const logout = async (req, res, next) => {
             res.status(httpStatus.UNAUTHORIZED).json({ success: false, error: 'Unauthorized' });
         }
     } catch (error) {
-        console.log(error)
         next(error);
     }
 }

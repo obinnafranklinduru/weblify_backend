@@ -5,7 +5,6 @@ const helmet = require('helmet');
 const httpStatus = require('http-status');
 const mongoSanitize = require('express-mongo-sanitize');
 const passport = require('passport');
-const xss = require('xss-clean');
 
 const limiter = require('./middlewares/rateLimiter.middleware');
 const errorHandler = require('./middlewares/error.middleware');
@@ -19,7 +18,6 @@ const app = express();
 app.use(helmet()); // set security HTTP headers
 app.use(express.json()); // parse json request body
 app.use(express.urlencoded({ extended: true })); // parse urlencoded request body
-app.use(xss()); // sanitize request data
 app.use(mongoSanitize()); // sanitize request data
 app.use(compression()); // gzip compression
 app.use(cors()); // enable cors
