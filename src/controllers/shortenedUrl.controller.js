@@ -1,6 +1,6 @@
 const httpStatus = require('http-status');
 const ShortenedUrl = require('../models/shortenedUrl.model');
-const { ErrorResponse } = require('../utils/errorResponse');
+const ErrorResponse = require('../utils/errorResponse');
 const generateUniqueId = require('../utils/shortIdGenerator');
 const config = require('../config');
 const { URLValidation } = require('../validations/shortUrl.validation');
