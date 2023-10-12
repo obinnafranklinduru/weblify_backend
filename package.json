@@ -10,8 +10,7 @@
     "start": "pm2 start ecosystem.config.json --no-daemon",
     "build": "yarn install",
     "dev": "nodemon src/server.js",
-    "test": "echo \"Error: no test specified\" && exit 1",
-    "test:watch": "jest -i --watchAll"
+    "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [
     "node",
@@ -25,8 +24,7 @@
     "es6",
     "es7",
     "es8",
-    "es9",
-    "jest"
+    "es9"
   ],
   "dependencies": {
     "bcryptjs": "^2.4.3",
