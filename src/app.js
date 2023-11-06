@@ -6,7 +6,7 @@ const httpStatus = require('http-status');
 const mongoSanitize = require('express-mongo-sanitize');
 const passport = require('passport');
 
-const limiter = require('./middlewares/rateLimiter.middleware');
+// const limiter = require('./middlewares/rateLimiter.middleware');
 const errorHandler = require('./middlewares/error.middleware');
 const ErrorResponse = require('./utils/errorResponse');
 const jwtStrategy = require('./config/passport');
@@ -22,7 +22,7 @@ app.use(mongoSanitize()); // sanitize request data
 app.use(compression()); // gzip compression
 app.use(cors()); // enable cors
 app.options('/*', cors()); // enable cors
-app.use(limiter); // Apply the rate limiting middleware to all requests
+// app.use(limiter); // Apply the rate limiting middleware to all requests
 
 // Passport JWT Configuration
 app.use(passport.initialize());
